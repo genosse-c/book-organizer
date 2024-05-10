@@ -1,0 +1,44 @@
+{
+  "timeZone": "America/New_York",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Drive",
+        "serviceId": "drive",
+        "version": "v3"
+      }
+    ]
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/drive.addons.metadata.readonly",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/script.locale"
+    
+  ],
+  "addOns": {
+    "common": {
+      "name": "Book Organizer",
+      "logoUrl": "https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihYAGF9B3wkpmd8Vxez1vYe3H5OBCcn7HOLaw4Rlx8zwxRcYGiORfq0Vq3vv7M4HHxq4SmFB2MchUqIPASAaELUYRbO9ztTrJso=w1161-h1052",
+      "useLocaleFromApp": true,
+      "homepageTrigger": {
+        "runFunction": "onHomepage",
+        "enabled": true
+      },
+      "universalActions": [{
+          "label": "Open settings",
+          "runFunction": "onOpenSettings"
+        }, {
+          "label": "Open Statistics",
+          "runFunction": "onOpenStatistics"
+        }]
+    },
+    "drive": {
+      "onItemsSelectedTrigger": {
+        "runFunction": "onDriveItemsSelected"
+      }
+    }
+  }
+}
