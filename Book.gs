@@ -212,4 +212,4 @@ function createDisplayBookCard(book_id, book_name, incl_meta){
 
   //assemble card
   return cs.build();
-}]
+}
