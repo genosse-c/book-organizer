@@ -44,7 +44,7 @@ function onGetMetadata(e){
  * Retrieves the metadata from the PDF.
  * Uses pdf-metadata-scraper (https://github.com/genosse-c/pdf_metadata_scraper)
  *
- * @param book {DriveApp.File} The book to be scraped
+ * @param {DriveApp.File} book The book to be scraped
  * @return {Object} The retrieved metadata.
  */
 function getPdfMetadata(book) {
@@ -60,7 +60,7 @@ function getPdfMetadata(book) {
  * Retrieves the metadata from the ePub.
  * Inspired by epub-metadata-parser (https://github.com/aeroith/epub-metadata-parser)
  *
- * @param book {DriveApp.File} The book.
+ * @param {DriveApp.File} book The book.
  * @return {Object} The retrieved metadata.
  */
 function getEpubMetadata(book) {
@@ -91,7 +91,7 @@ function getEpubMetadata(book) {
 /**
  * Retrieves the metadata from the file name of the book.
  * Iterates over different filters defined in METADATA_FILTER
- * @param book_name {String} The book name.
+ * @param {String} book_name The book name.
  *
  * @return {Array} The retrieved metadata.
  */

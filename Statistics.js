@@ -4,13 +4,16 @@
  * in a google sheet. Shows a notification to the user upon completion
  *
  * @param {Object} e an event object
- * @return {CardService.Notification} A notification to show to the user.
+ * @return {CardService.ActionResponse} A notification to show to the user.
  */
 function onCreateStatistics(e) {
   createStatistics();
 
   return CardService.newActionResponseBuilder()
-      .setNotification(CardService.newNotification().setText('Statistics have been updated. Details can be found in the Library Sheet'))
+      .setNotification(
+        CardService.newNotification()
+          .setText('Statistics have been updated. Details can be found in the Library Sheet')
+        )
       .build();
 }
 
@@ -80,7 +83,7 @@ function createStatisticsCard() {
 
   cs.setFixedFooter(CardService.newFixedFooter().setPrimaryButton(
       CardService.newTextButton().setTextButtonStyle(CardService.TextButtonStyle.OUTLINED).setText('Update Statistics').setOnClickAction(
-        CardService.newAction().setFunctionName('createStatistics')
+        CardService.newAction().setFunctionName('onCreateStatistics')
       )
     )
   )
@@ -121,7 +124,6 @@ function getLibraryData(){
  * and writes folder and book file information to it.
  * Information in the Spreadsheet is overwritten each time this function is called
  * In order to be useful, this information has to be postprocessed in the library spreadsheet
- *
  */
 function createStatistics(){
   let books_sheet,

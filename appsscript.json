@@ -28,11 +28,14 @@
         "enabled": true
       },
       "universalActions": [{
-          "label": "Open settings",
+          "label": "Settings",
           "runFunction": "onOpenSettings"
         }, {
-          "label": "Open Statistics",
+          "label": "Statistics",
           "runFunction": "onOpenStatistics"
+        },{
+          "label": "About",
+          "runFunction": "onOpenAbout"
         }]
     },
     "drive": {

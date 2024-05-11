@@ -3,7 +3,7 @@
  *
  * Copyright 2024 Conrad Noack
  *
- * Mai 4 2024
+ * May 4th 2024
  *
  * This software relies heavily on https://github.com/preciz/pdf_info (MIT License)
  * with some additional inspiration based on https://github.com/sindresorhus/uint8array-extras (MIT License)
@@ -12,7 +12,7 @@
 
 class PDFScraper {
   /**
-  * Constructor for JSGloss
+  * Constructor for PDFScraper
   *
   * @param  binary variable holding the binary representation of the PDF to be scrapped
   * @return      instantiated JSGloss object

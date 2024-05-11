@@ -2,17 +2,17 @@
 /**
  * Callback for rendering card when a user has selected a book in the book organizer card.
  *
- * @return {CardService.Card} The card to show to the user.
+ * @return {CardService.ActionResponse} The card to show to the user.
  */
 function onDisplayBook(e) {
   //build response card
-  var card = createDisplayBookCard(e.commonEventObject.parameters.book_id, e.commonEventObject.parameters.book_name)
+  const card = createDisplayBookCard(e.commonEventObject.parameters.book_id, e.commonEventObject.parameters.book_name)
 
   // Create an action response that instructs the add-on to replace
   // the current card with the new one.
-  var navigation = CardService.newNavigation()
+  let navigation = CardService.newNavigation()
       .pushCard(card);
-  var actionResponse = CardService.newActionResponseBuilder()
+  let actionResponse = CardService.newActionResponseBuilder()
       .setNavigation(navigation);
   return actionResponse.build();
 
@@ -20,12 +20,13 @@ function onDisplayBook(e) {
 
 /**
  * Callback for editing a book from the book display card.
+ * Renames the book and optionally moves it to its Author folder
  * Re-opens the display card afterwards
  *
- * @return {CardService.Card} The card to show to the user.
+ * @return {CardService.ActionResponse} The card to show to the user.
  */
 function onEditBook(e){
-  var book_name = e.commonEventObject.parameters.book_name,
+  let book_name = e.commonEventObject.parameters.book_name,
     move = e.commonEventObject.parameters.move,
     book_id = e.commonEventObject.parameters.book_id,
     title = (e.commonEventObject.formInputs.title ? e.commonEventObject.formInputs.title.stringInputs.value[0] : false),
@@ -34,12 +35,12 @@ function onEditBook(e){
 
   // show error notification if either title or author are empty
   if (!title || !author) {
-    var flds = ['The field(s)'];
+    let flds = ['The field(s)'];
     if (!title)
       flds.push('title');
     if (!author)
       flds.push('author');
-    var text = "The field(s) ${flds.join(',')} cannot be empty";
+    let text = "The field(s) ${flds.join(',')} cannot be empty";
 
     return CardService.newActionResponseBuilder()
       .setNotification(CardService.newNotification().setText(text))
@@ -50,21 +51,21 @@ function onEditBook(e){
   title = title.trim();
 
   //STEP 1: rename file
-  var file = DriveApp.getFileById(book_id);
-  var file_ending = file.getMimeType().match(/pdf/gi) ? '.pdf' : '.epub';
-  var fn_parts = [title, "["+author+"]"];
+  const file = DriveApp.getFileById(book_id);
+  const file_ending = file.getMimeType().match(/pdf/gi) ? '.pdf' : '.epub';
+  let fn_parts = [title, "["+author+"]"];
   if (year) {
      year = year.trim();
     fn_parts.push("("+year+")");
   }
-  var new_filename = fn_parts.join('_');
+  let new_filename = fn_parts.join('_');
   new_filename += file_ending;
   file.setName(new_filename);
 
   //STEP 2: move file if necessary
   if(move && move == 'on'){
-    var books_folder = getFolderFromSetting('books_folder');
-    var destination = books_folder.getFoldersByName(author);
+    const books_folder = getFolderFromSetting('books_folder');
+    let destination = books_folder.getFoldersByName(author);
     if (!destination.hasNext()){
       destination = DriveApp.createFolder(author);
       destination.moveTo(books_folder);
@@ -76,13 +77,13 @@ function onEditBook(e){
     }
   }
 
-  var card = createDisplayBookCard(book_id, new_filename);
+  const card = createDisplayBookCard(book_id, new_filename);
 
   // Create an action response that instructs the add-on to replace
   // the current card with the new one.
-  var navigation = CardService.newNavigation()
+  let navigation = CardService.newNavigation()
       .updateCard(card);
-  var actionResponse = CardService.newActionResponseBuilder()
+  let actionResponse = CardService.newActionResponseBuilder()
       .setNavigation(navigation);
   return actionResponse.build();
 }
@@ -97,16 +98,16 @@ function onEditBook(e){
  * @return {CardService.Card} The assembled card.
  */
 function createDisplayBookCard(book_id, book_name, incl_meta){
-  var bsfld = getFolderFromSetting('books_folder');
-  var aflds = bsfld.getFolders();
-  var authors = [];
+  const bsfld = getFolderFromSetting('books_folder');
+  let aflds = bsfld.getFolders();
+  let authors = [];
 
   while (aflds.hasNext()) {
     authors.push(aflds.next().getName().trim());
   };
 
   //rubric section
-  var rubric_section = CardService.newCardSection()
+  let rubric_section = CardService.newCardSection()
     .addWidget(CardService.newTextParagraph()
     .setText(`Set author, title and (optionally) year book was published.
     When selecting "Save and Move" the book will be renamed and moved into the respective author folder.\nIf the author folder does not exist, it will be created.
@@ -115,8 +116,8 @@ function createDisplayBookCard(book_id, book_name, incl_meta){
   )
 
   //form section
-  var form_section = CardService.newCardSection();
-  var {title, author, year} = extractMetadataFromFileName(book_name);
+  let form_section = CardService.newCardSection();
+  let {title, author, year} = extractMetadataFromFileName(book_name);
 
   let t_input =CardService.newTextInput()
     .setFieldName('title')
@@ -156,10 +157,10 @@ function createDisplayBookCard(book_id, book_name, incl_meta){
   form_section.addWidget(CardService.newDivider());
 
   //metadata section
-  var metadata_section = CardService.newCardSection();
+  let metadata_section = CardService.newCardSection();
   if (incl_meta){
-    var book = DriveApp.getFileById(book_id);
-    var metadata = book.getMimeType().match(/pdf/gim) ? getPdfMetadata(book) : getEpubMetadata(book);
+    const book = DriveApp.getFileById(book_id);
+    let metadata = book.getMimeType().match(/pdf/gim) ? getPdfMetadata(book) : getEpubMetadata(book);
 
     if (Object.keys(metadata).length > 0){
       for(key in metadata){
@@ -196,13 +197,12 @@ function createDisplayBookCard(book_id, book_name, incl_meta){
     .newTextButton()
     .setText("Save")
     .setOnClickAction(editAction.setParameters({"book_name": book_name, "book_id": book_id, "move": "off"}));
-
-
-  var footer = CardService.newFixedFooter()
+  let footer = CardService.newFixedFooter()
     .setPrimaryButton(saveButton)
     .setSecondaryButton(moveButton);
 
-  var cs = CardService.newCardBuilder()
+  //card
+  let cs = CardService.newCardBuilder()
     .setName('display')
     .setHeader(CardService.newCardHeader().setTitle("Edit Book"))
     .addSection(rubric_section)

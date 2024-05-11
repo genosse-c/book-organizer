@@ -85,14 +85,13 @@ function createInstructionsCard(){
  * Creates the book organizer card listing files in a special folder.
  * It is shown when the special folder is selected in the drive
  *
- * @param folder_id {String} The id of the special folder.
+ * @param {String} folder_id The id of the special folder.
  * 
  * @return {CardService.Card} The assembled card.
  */
 function createBookOrganizerCard(folder_id) {
   let section = CardService.newCardSection(),
     texts = [],
-    files = [],
     peekHeader;
   const folder = DriveApp.getFolderById(folder_id);
   let files = folder.getFiles();
@@ -186,8 +185,8 @@ function createNonConformantBooksCard(){
 /**
  * Helper function: Splits an array into multiple arrays containing a specified number of elements of the source array.
  *
- * @param arr {array} The array to be split into chunks
- * @param chunksize {Integer} The size of each chunk
+ * @param {array} arr The array to be split into chunks
+ * @param {Integer} chunksize The size of each chunk
  * 
  * @return {array} An array of arrays containing the source array in chunks
  */

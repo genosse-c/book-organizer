@@ -22,10 +22,27 @@ const default_settings = {
  * @return {UniversalActionResponse}
  */
 function onOpenSettings(e) {
-  return CardService.newUniversalActionResponseBuilder()
-      .displayAddOnCards(
-          [createSettingsCard(), createAboutCard()])
-      .build();
+  return CardService.newActionResponseBuilder()
+      .setNavigation(CardService.newNavigation()
+        .pushCard(createSettingsCard())
+      )
+      .build();   
+}
+
+/**
+ * Create two cards to control the add-on settings and
+ * present other information. These cards are displayed in a list when
+ * the user selects the associated "Open settings" universal action.
+ *
+ * @param {Object} e an event object
+ * @return {UniversalActionResponse}
+ */
+function onOpenAbout(e) {
+  return CardService.newActionResponseBuilder()
+      .setNavigation(CardService.newNavigation()
+        .pushCard(createAboutCard())
+      )
+      .build();   
 }
 
 /**
@@ -35,10 +52,16 @@ function onOpenSettings(e) {
  * @return {UniversalActionResponse}
  */
 function onSaveSettings(e) {
+  let settings = {};
+  for(const key in default_settings) {
+    settings[key] = e.commonEventObject.formInputs[key].stringInputs.value[0];
+  }
+  PropertiesService.getUserProperties().setProperties(settings);
+
   const card = createSettingsCard('Settings have been updated.');
 
   let navigation = CardService.newNavigation()
-      .pushCard(card);
+      .updateCard(card);
   let actionResponse = CardService.newActionResponseBuilder()
       .setNavigation(navigation);
   return actionResponse.build();
@@ -68,8 +91,8 @@ function onResetSettings(e){
 
 /**
  * Create and return a built settings card.
- * @param {string} a message to be displayed prominently on the card
- * @return {Card}
+ * @param {string} msg a message to be displayed prominently on the card
+ * @return {CardService.Card}
  */
 function createSettingsCard(msg) {
   const props = PropertiesService.getUserProperties();
@@ -142,8 +165,40 @@ function createAboutCard() {
     .setHeader(CardService.newCardHeader().setTitle('About'))
     .addSection(CardService.newCardSection()
       .addWidget(CardService.newTextParagraph()
-        .setText(`This add-on manages an eBook library. It currently has support for PDF and ePub books.
-        Features include facilities to rename books based on metadata, building statistics on the library.`)
+        .setText('This add-on manages an eBook library. It currently has support for PDF and ePub books.')
+      )
+      .addWidget(CardService.newTextParagraph()
+        .setText('The structure of the library maintained by the add-on consists of a library root folder. Below it, each author has a folder containing all the books for that author.')
+      )      
+      .addWidget(CardService.newTextParagraph()
+        .setText('Features include:')
+      )
+      .addWidget(CardService.newDecoratedText()
+        .setStartIcon(CardService.newIconImage().setIcon(CardService.Icon.STAR))
+        .setText('Renaming books')
+      ) 
+      .addWidget(CardService.newDecoratedText()
+        .setStartIcon(CardService.newIconImage().setIconUrl('https://placehold.co/96/white/white.png'))
+        .setText('<i>based on the file name</i>')
+      )
+      .addWidget(CardService.newDecoratedText()
+        .setStartIcon(CardService.newIconImage().setIconUrl('https://placehold.co/96/white/white.png'))
+        .setText('<i>based on eBook metadata</i>')
+      ) 
+      .addWidget(CardService.newDecoratedText()
+        .setStartIcon(CardService.newIconImage().setIcon(CardService.Icon.STAR))
+        .setText('Creating statistics')
+      )               
+      .addWidget(CardService.newTextParagraph()
+        .setText('The statistics are created in a Google sheet that can be used to aid in batch updating files.')
+      )
+      .addWidget(CardService.newDivider()) 
+      .addWidget(CardService.newTextParagraph()
+        .setText('Source code for the add-on can be found on <a href="https://github.com/genosse-c/book-organizer">github</a>.')
+      )      
+      .addWidget(CardService.newDivider()) 
+      .addWidget(CardService.newTextParagraph()
+        .setText('Source code for the app script bound to the statistics sheet is also on <a href="https://github.com/genosse-c/book-organizer-statistics">github</a>.')
       )
     )
 
@@ -155,7 +210,7 @@ function createAboutCard() {
  * If the setting is not found in the user properties, the value from default settings is used
  * In addition the default value is stored in the user properties
  *
- * @param {string} name of the setting
+ * @param {string} setting name of the setting
  * @return {string} the value of the setting
  */
 function getSetting(setting){
@@ -173,17 +228,17 @@ function getSetting(setting){
  * If not found in user properties, the value from the default settings is used instead and
  * stored in user properties. Using the value, a folder is identified and returned.
  *
- * @param {string} name of the setting
+ * @param {string} sname name of the setting
  * @return {Folder} a folder from the user drive
  */
-function getFolderFromSetting(setting){
-  const setting = getSetting(setting);
+function getFolderFromSetting(sname){
+  const svalue = getSetting(sname);
   let folder;
-  if (setting.match(/^\d[\w_-]{25,}$/gmi)){
-    folder = DriveApp.getFolderById(setting);
+  if (svalue.match(/^\d[\w_-]{25,}$/gmi)){
+    folder = DriveApp.getFolderById(svalue);
   } else {
-    folder = DriveApp.getFoldersByName(setting).next();
-    PropertiesService.getUserProperties().setProperty(setting, folder.getId());
+    folder = DriveApp.getFoldersByName(svalue).next();
+    PropertiesService.getUserProperties().setProperty(sname, folder.getId());
   }
   return folder;
 }
